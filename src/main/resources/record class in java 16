@@ -1,0 +1,91 @@
+Java 16 record class.. replacement of lombok..
+ it will write constructors, getters ,
+  (no setters since it's by default  immutable)hash code, equal, tostriing , everything for you!!!
+
+
+Why records are a bad fit for JPA entities
+
+1)records are immutable and it should not be used as JPA entity
+2)All fields are final
+3)JPA and Hibernate need to set values like id, createdAt, updatedAt after object creation
+4)Records do not support a no-args constructor
+Hibernate uses proxies and bytecode enhancement
+
+Records are final
+
+Hibernate cannot create proxy subclasses
+
+Lifecycle annotations don’t work properly
+
+Annotations like CreationTimestamp and UpdateTimestamp rely on mutability
+Even though some experimental hacks exist, records should not be used as JPA entities in production systems.
+
+
+Entities are mutable classes
+Records are used for DTOs only
+This separation is considered best practice in modern Spring Boot projects.
+
+Best Industry standerd Rules:
+1)controller should accept DTO and not entity
+2)Controller Returns DTO Not Entity
+3)Records should not be used as Entity, because all fields are final , and we want to update them actually
+4)record classes are perfect example of DTO which we can use as request and response for controller and service layer
+
+
+
+steps:
+1)dont use @Data annotation for Product entity , it will generate hashcode and equals which can cause issues with JPA entities.
+instead, use @Getter and @Setter annotations
+
+2)Step 2: Create Record DTOs (Best Use Case for Records)
+Request DTO using record
+public record ProductRequest(
+        String name,
+        double price
+) {}
+
+Response DTO using record
+public record ProductResponse(
+        Long id,
+        String name,
+        double price,
+        LocalDateTime createdAt,
+        LocalDateTime updatedAt
+) {}
+
+This is where records shine
+
+Immutable
+
+Clean
+
+Perfect for API contracts
+
+Step 3: Service Layer Mapping
+service methods should accept DTO request
+create a new entity class
+nad get details from request and set to entity
+and return a DTO
+example:
+public ProductResponse createProduct(ProductRequest request) {
+        Product product = new Product();
+        product.setName(request.name());
+        product.setPrice(request.price());
+
+        Product saved = repository.save(product);
+
+        return new ProductResponse(
+                saved.getId(),
+                saved.getName(),
+                saved.getPrice(),
+                saved.getCreatedAt(),
+                saved.getUpdatedAt()
+        );
+    }
+
+ Step 4: Controller Returns DTO Not Entity
+ example:
+ @PostMapping
+     public ProductResponse create(@RequestBody ProductRequest request) {
+         return service.createProduct(request);
+     }

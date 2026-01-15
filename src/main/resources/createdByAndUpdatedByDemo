@@ -1,0 +1,138 @@
+Q ,
+I want to create a db field,
+Named created at timestamp
+And updated at timestamp
+But at the same time ,
+
+* Created at field should not be updated
+* Updated by field should not be insertable
+How to achieve this
+Ans
+@column updatable = false
+@column insertable = false
+
+
+
+1. Entity Class
+java
+import jakarta.persistence.*;
+import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.LocalDateTime;
+
+@Entity
+@Data
+public class Product {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String name;
+    private double price;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at", insertable = false)
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
+}
+2. Repository Interface
+java
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ProductRepository extends JpaRepository<Product, Long> {
+}
+3. Service Class
+java
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+public class ProductService {
+
+    @Autowired
+    private ProductRepository productRepository;
+
+    @Transactional
+    public Product createProduct(Product product) {
+        return productRepository.save(product);
+    }
+
+    @Transactional
+    public Product updateProduct(Long id, String newName) {
+        Product product = productRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Product not found"));
+        product.setName(newName);
+        return productRepository.save(product);
+    }
+
+    public Product getProduct(Long id) {
+        return productRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Product not found"));
+    }
+}
+4. Controller
+java
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/products")
+public class ProductController {
+
+    @Autowired
+    private ProductService productService;
+
+    @PostMapping
+    public Product createProduct(@RequestBody Product product) {
+        return productService.createProduct(product);
+    }
+
+    @PutMapping("/{id}")
+    public Product updateProduct(@PathVariable Long id, @RequestParam String name) {
+        return productService.updateProduct(id, name);
+    }
+
+    @GetMapping("/{id}")
+    public Product getProduct(@PathVariable Long id) {
+        return productService.getProduct(id);
+    }
+}
+5. Test the Implementation
+Create a Product (POST /api/products)
+json
+{
+    "name": "Laptop",
+    "price": 999.99
+}
+createdAt will be set automatically
+updatedAt will be null initially
+Update the Product (PUT /api/products/1?name=Gaming Laptop)
+createdAt remains unchanged
+updatedAt will be set to current timestamp
+Get the Product (GET /api/products/1)
+Will show both timestamps
+Key Points:
+@CreationTimestamp:
+Automatically sets the timestamp when the entity is first persisted
+updatable = false prevents any updates to this field
+@UpdateTimestamp:
+Automatically updates the timestamp when the entity is updated
+insertable = false means it won't be included in INSERT statements
+@Transactional:
+Ensures that the operations are performed within a transaction
+Required for update operations
+Lombok's @Data:
+Generates getters, setters, toString, equals, and hashCode methods
+This implementation ensures that:
+
+createdAt is set only once when the entity is first created
+updatedAt is updated on every update
+The database schema will have the appropriate NOT NULL and default constraints
+Would you like me to explain any part of this implementation in more detail?

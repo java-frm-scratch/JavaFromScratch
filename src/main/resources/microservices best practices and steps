@@ -1,0 +1,24 @@
+1. use Record as DTO pattern they are best suited for request and response
+2. dont use Entity classes for request and response, , entity classes should only talk with database layer
+3. you can externalize the configuration if you have 100 of microservices
+so in order to do this, you need to create a config server
+4. then comes service discovery
+there will be eureka server -- here all services like gateway and
+all other microservices will register to eureka server
+- lets say account service is registered with eureka server, then , when you start the account server, then you will get in console:
+below logs will be print in account service run console:
+a. Starting heartbeat executor: renew interval is: 30 --> which means account service will send its heartbeat to eureka server every 30 seconds
+b.  then it will show the registration status which means account service is registered with eureka server successfully .. like this : DiscoveryClient_ACCOUNT-SERVICE/account-service:15bc638fd3fdcb272839b5ac9386dfa5 - registration status: 204
+c. Note: http://localhost:8761/eureka/apps if you go to this url of eureka server, then you will be bale to see what are all services are registtered, and what are all instances registered
+- also if you want tonly your pirticular service details, then you can get it using url: http://localhost:8761/eureka/apps/ACCOUNT-SERVICE
+
+d. if you go to http://localhost:8761/ this url on which eureka server is running then, you will be able to see all the running services in dashboard
+gateway will be the entry point
+all requests will come to gateway
+then gateway will check its application.yml file and check the routing details for the request
+and it will find the servicename
+then gateway , will consult with eureka server and eureka server will provide what are all running instances
+for that service
+then gateway will use round robin method to  route the request to pirticular instance
+so if you hit the port multiple times, ten you will come to know how gateway is dynamically routing the requests
+5.

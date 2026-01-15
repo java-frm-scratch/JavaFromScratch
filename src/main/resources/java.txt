@@ -1,0 +1,344 @@
+interview question: 1
+Q) in a single spring boot application, can application.properties and application.yaml file both resides together? If yes then which one will get highest preference?
+ans:
+application.properties will get highest preference
+
+however you should use
+Application.yaml
+-	Clear hierarchical structure
+-	Better readability
+-	Repetition is less
+-	Widely used in industry
+
+Interview question 2:
+Which is embedded server in spring boot app? Can we remove existing embedded server? If yes then how? And how to add new server? How to verify newly added server?
+Ans:
+-	Tomcat is embedded server in spring boot
+-	Yes we can remove existing embedded tomcat server by adding exclusion to starter web dependency
+-	We can ad new dependency lets say jetty, and build it
+-	We can verify after build, in external libraries, tomcat will not show, instead it will show jetty
+-	Also when application is started, then we will see on startup Jetty started on poort XXX
+
+
+
+tomcat is embedded in default spring boot app
+
+
+
+We can remove existing tomcat and can add another server jetty
+
+
+build  the project and you will see jetty server is added
+
+when you will start the application, you will see jetty server started instead of tomcat server started message like below
+
+======================================================
+
+
+Try with resources
+Real world scenarios
+U have a db table products
+U need to load the product  ids from a text file
+And get the data from db
+And then
+: Installed docker desktop
+Pulled redis image
+Started redis container
+Redis running on port 6379
+: Java 21 temurin installed
+Maven 3.9.7 installed
+Intellij  कम्युनिटी edition installed
+: MySQL community server installed
+: Dbeaver open source db client installed
+: Installing rabnitmq
+: Rabnitmq installed as a docker image
+: Can see rabbit mq running in docker
+
+
+===========================================================================
+
+Monolith
+- simple development
+- simple deployment
+- small teams and application
+- fewer cross cutting concerns
+- better performance due to no network latency
+- cons
+- difficult to adopt new technology
+- single code base difficult to maintain
+- no fault tolerance
+- tiny update need full deployment
+
+: Every team develop code and deploy to same db
+: Jenkins pipeline
+: Packed as ear or war
+Have a single db
+: Ear or war contain ui code, java code, db code, inside and can be deployed on server
+: Services oriented architecture SOA
+Here ui and java code seperate
+,
+Seperately deployment on different server
+
+Cons
+* Soap protocol makes complex management
+* High investment cost due to middle ware vendor  eg esb - enterprises service bus
+*
+*
+*
+
+Advantages of Microservices using Spring Boot
+
+Independent Services
+Each microservice is a separate Spring Boot application focused on a single business functionality.
+
+Independent Deployment
+Microservices can be deployed individually. Changes in one Spring Boot service do not affect others.
+
+Scalability
+Only the required microservice can be scaled based on load, instead of scaling the entire application.
+
+Faster Development
+Multiple teams can work on different Spring Boot microservices in parallel, increasing development speed.
+
+Fault Isolation
+Failure of one microservice does not bring down the entire system, improving system stability.
+
+Easy Configuration
+Spring Boot provides auto configuration and reduces boilerplate code, making development simpler.
+
+Embedded Servers
+Spring Boot microservices run with embedded servers like Tomcat or Netty, no external server setup needed.
+
+Technology Flexibility
+Different microservices can use different databases or technologies if required.
+
+Service Discovery Support
+Spring Boot integrates easily with Eureka for registering and discovering microservices.
+
+API Gateway Integration
+Spring Cloud Gateway provides routing, load balancing, and security for microservices.
+
+Cloud Ready
+Spring Boot works well with Docker and Kubernetes for containerized deployments.
+
+Easy Maintenance
+Smaller codebases are easier to understand, maintain, and enhance.
+
+Production Ready Features
+Spring Boot Actuator provides health checks, metrics, and monitoring support.
+
+Better Continuous Delivery
+Independent services enable faster CI and CD pipelines.
+=============================================================================================
+
+Q ,
+I want to create a db field,
+Named created at timestamp
+And updated at timestamp
+But at the same time ,
+
+* Created at field should not be updated
+* Updated by field should not be insertable
+How to achieve this
+Ans
+@column updatable = false
+@column insertable = false
+======================================================
+
+Customer repository.save(customer);
+Here spring data jpa framework will take input customer object, prepare sql statement, create connection with database, execute the statement, commitment of transaction, closing the connection, all this boilerplate code will be taken care by spring data jpa
+
+: Give responsibility of auditing to spring data
+Always add auditing to the entities.. for that create base entity
+: Always document all rest API
+Just add sprindoc-openapi library and you will be able to use all swagger APIs
+
+=======================================================================================================
+
+: ava 17 sealed keyword .. used to restrict the inheritance in interface
+: Java 16 record class.. replacement of lombok.. it will write constructors, getters , (no setters since it's by default  immutable)hash code, equal, tostriing , everything for you
+[: Text  blocks in java 15 ...
+
+
+
+Virtual threads ...concept ...Platform threads .. ( normal threads uses stack memory..let's say you are creating 100 threads then all threads need stack memory.. all this memory is block doesn't matters if these threads. Will use them or not
+... That's why traditional platform threads are costly to create...so virtual threads can come to rescue
+
+
+
+Out of memory error if tried to create 10 thousand platform threads with blocking operation
+
+
+
+: Just replace of platform with of virtual
+: And you will be able to teate million of threads.. java 21
+
+
+Q how does spring boot  decides which auto configuration to apply
+Ans
+Spring Boot decides which auto-configurations to apply by loading all candidates and conditionally activating them based on the classpath, existing beans, configuration properties, and application type—while always backing off for user-defined beans
+
+
+
+
+Strangeler facade pattern in spring boot....
+Let's you have a monolith application.. and having components like cards, payments, loan etc...
+And your company says , it's very critical application for my company.. and I don't want any downtime....
+So can you please migrate this to new spring boot microservices stack..
+With no downtime..
+And yes..
+You start by taking 1 component out let's say payment..
+Implement that completely..test it.. and if everything is working..
+Then point your monolith to this new payment service
+.
+Same for other components
+This is strangler facade pattern in microservices
+पौधा इस पेड़ पर जाता है धीरे धीरे, और पेड़ को खा जाता है, और पेड़ खत्म हो जाता है।
+वैसे ही मोनोलिथ एप्लीकेशन भी धीरे धीरे खत्म हो जाता हैं।
+इसलिए स्ट्रंगलर fasad  पैटर्न बोला है
+
+
+
+: Microservices architecture
+: Generate docker image -- create a running container of your docker image -- push image to docker hub repository
+: Docker
+U can create docker images 3 ways
+1. Using dockerfile, but you should be super expert if you are using this, since we are developers,and don't know security  standards we should use below 2 options
+2. Buildpacks .. very good .. it will work for any language....
+3. Google jib very good..here , it will work even if docker is not installed on your machine... It is much faster than बिल्डपॅक्स
+
+
+
+@ value approach of reading properties.. not good .. since what if you have 100 of properties.. then you need to add as many fields
+Disadvantages
+* Hard coding property value
+*
+Approach 2 ..using environment
+* Autiwure environment interface .. import from spring core package
+* All environment variables will be accessible now
+* Eg environment.getproperty("JAVA_HOME")
+*
+*Will work if less amount of properties.. not good for larger number of properties
+Approach 3.. recommended...
+* With help of @
+* Define properties in yaml or properties file
+* Add a record  class .. eg public record Account contactinfodto (string message, Map of contact details, list of contact numbers
+* Getters will be generated..
+* All fields are final
+* It's very best option
+* Annotate it with @Configurationproperties(prefix = Accounts
+* On spring boot main class add annotation..@enableConfigurationPtoperties( value = accountsinfodto.class
+* During startup this will read properties
+* You can use this pojo class.. no need @value annotation
+
+Approach 4...
+What if we want different properties to be liadedfor
+Different env .. dev, prod, qa,
+* Then above approaches will not work
+* Example database credentials will be different for different envs like dev , qa, prod
+* Solution is profiles
+* We can create different profiles dev, qa, prod
+* Based on current active env, we can use them
+* application_qa.properties, application _prod.properties etc
+* Spring.profiles.activ
+* We can activate multiple profiles at the same time, using comma seperate values
+* Server.properties, we can keep in default  application.properties
+* H2 also we can keep default
+* MySQL creds we can have in different profiles
+*
+
+* create different env  files
+* In main application properties file mention spring.config.import
+* - application.qa.properties
+* Application.d3v.properties
+* By default local  profile will be active named application.properties
+* If we want any other profile to be active, then go to main application.properties file, and write..
+* Pring.profile.active= qa,uat,sit  etc
+
+How to externalise spring boot properties
+* Command line arguments..it has highest priority
+* Java -jar XYZ.jar  --build.version=1.2
+* Jvm system properties.. using -d
+* Using environment variables .. system.getenv in this way we can access ..eg env: BUILD_VERSION=1.3;
+* In eclipse or intellij "program arguments" , whatever we give, that is command line arguments only
+* Then in intellij itself, we have another option named "environment variables".. add property there.. make sure all environment variables are seperate by semicolon.....also replace . With underscore...and make it in uppercase...
+* In vm options also in intellij itself you can add properties.. make sure you add -D before property ...
+* Let's say you have given propery everywhere, program arguments, environment variables, and vm arguments...so highest preference will be given to program arguments...
+* After program arguments, vm options will have next priority
+* After vm options, will have next priority to environment variables
+* After environment variables, we have next priority to , application properties file
+*
+*
+
+
+Why you have constructors in abstract class if you cannot create object...
+Ans
+It's  for creating object of child class. Of that abstract class
+Abstract a = new Child ();
+
+
+
+
+Q
+Are streams reusable?
+Ans.  No streams are not reusable
+It will throw error this stream is already worked upon
+
+
+What is yield keyword in java 14
+Ans
+From yield, you can return a result .
+Which we say, from switch, we can return result
+
+
+
+
+Q.
+You have a class, .. it have a global class level  variable...
+And
+If you have an anonymous inner class and implementation .of the method in it.... and  let's say you have the same  variable in the anamous inner class as well.. and you print this variable...
+What will be the output..
+The output will print inside anonymous variables ..
+Now , you change it to lambda expression..
+What will be the outcome
+Now it will be global class level variable..
+Which means lambda will point to class level variable
+
+
+Q
+What is @refresh scope annotation
+
+To refresh your configuration, you can add actuator refresh config,
+And also you need to tell spring by adding @RefreshScope annotation.. that this particular bean only need to refresh instead of entire beans
+
+
+Program to print the highest salary by department
+
+
+
+Q.
+Can we have method implementation in interface?
+No we don't have but we can add default method  since java 8.
+Fine
+But let's say I have printer and scanner interface.. and both have same default method implementation..
+And then,
+I have a class multifunctional device, and which implement both interface, then which method will be called printer or scanner..
+Ans :
+We need to call method using interface name.super.methidname
+
+
+
+
+Find highest paid employee in each department
+
+
+Q.
+Without restart and redeploy of application to how will you update configuration (properties )inside  the  spring boot application?
+Ans
+U can use spring cloud config
+* Spring cloud config externalises your configuration
+* U can store your configuration in a GitHub repository...
+* Then fetch that using a config server
+* And your spring boot application can connect to config server
+* Ans then using actuator refresh api, u can directly go ahead and refresh the application configuration
+

@@ -1,0 +1,46 @@
+1. Create the Common DTOs Module
+Create a new Maven module:
+In your parent project, create a new module named common-dtos
+Set the packaging type to jar in pom.xml:
+xml
+<packaging>jar</packaging>
+Configure pom.xml:
+Use spring-boot-dependencies as the parent (not spring-boot-starter-parent)
+Add only the necessary dependencies (validation, lombok, etc.)
+No need for Spring Boot starters or Eureka client dependencies
+2. Define Your DTOs
+Create DTO classes in the common-dtos module:
+Example: CardRequest.java, CardResponse.java
+Use Lombok annotations for clean code
+Add validation annotations if needed
+Example DTO:
+java
+@Schema(description = "Request object for creating/updating a card")
+public record CardRequest(
+    @NotBlank String cardNumber,
+    @NotBlank String cardType,
+    @Positive double creditLimit,
+    @NotNull Long customerId
+) {}
+3. Build and Install
+Build the module:
+bash
+mvn clean install
+This will install the JAR in your local Maven repository.
+4. Use in Microservices
+Add dependency in your service's pom.xml:
+xml
+<dependency>
+    <groupId>com.java.from.scratch</groupId>
+    <artifactId>common-dtos</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+</dependency>
+Use the DTOs in your controllers and services:
+java
+@PostMapping
+public ResponseEntity<CardResponse> createCard(@Valid @RequestBody CardRequest request) {
+    // Implementation
+}
+5. Important Notes
+Keep it simple:
+Only include shared DTOs, enums, and utility classes

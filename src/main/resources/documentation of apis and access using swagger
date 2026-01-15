@@ -1,0 +1,170 @@
+I want to see the swagger apis how to add that in my existing application?
+ans: sprindoc-openapi is the dependency you need to add in your spring boot application
+it will open a swagger api
+we can access swagger api at url:http://localhost:8081/swagger-ui.html
+
+I'll help you add SpringDoc OpenAPI (Swagger UI) to your Spring Boot application. Here's a step-by-step guide:
+
+1. Add Dependencies
+Add these dependencies to your pom.xml:
+
+xml
+<dependency>
+    <groupId>org.springdoc</groupId>
+    <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+    <version>2.3.0</version>
+</dependency>
+2. Configure Swagger UI
+Add this configuration class:
+
+java
+package com.java.from.scratch.config;
+
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class SwaggerConfig {
+    @Bean
+    public OpenAPI customOpenAPI() {
+        return new OpenAPI()
+            .info(new Info()
+                .title("Product API Documentation")
+                .version("1.0")
+                .description("API documentation for Product Management System"));
+    }
+}
+3. Add Annotations to Your Controller
+Update your ProductController with Swagger annotations:
+
+java
+@Tag(name = "Product Controller", description = "APIs for managing products")
+@RestController
+@RequestMapping("/api/products")
+public class ProductController {
+
+    @Autowired
+    private ProductService productService;
+
+    @Operation(summary = "Create a new product")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Product created successfully",
+                    content = @Content(schema = @Schema(implementation = Product.class))),
+        @ApiResponse(responseCode = "400", description = "Invalid input")
+    })
+    @PostMapping
+    public Product createProduct(@RequestBody Product product) {
+        return productService.createProduct(product);
+    }
+
+    @Operation(summary = "Update a product by ID")
+    @PutMapping("/{id}")
+    public Product updateProduct(
+            @Parameter(description = "ID of the product to be updated") @PathVariable Long id,
+            @Parameter(description = "New name for the product") @RequestParam String name) {
+        return productService.updateProduct(id, name);
+    }
+
+    @Operation(summary = "Get a product by ID")
+    @GetMapping("/{id}")
+    public Product getProduct(
+            @Parameter(description = "ID of the product to be retrieved") @PathVariable Long id) {
+        return productService.getProduct(id);
+    }
+}
+4. Add Annotations to Your Entity
+Add schema descriptions to your Product entity:
+
+java
+@Schema(description = "Product entity representing a product in the system")
+@Entity
+@Data
+public class Product {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(description = "The database generated product ID")
+    private Long id;
+
+    @Schema(description = "Name of the product", example = "Laptop")
+    private String name;
+
+    @Schema(description = "Price of the product", example = "999.99")
+    private double price;
+
+    @Schema(description = "Date when the product was created", hidden = true)
+    @Column(name = "created_at", nullable = false, updatable = false)
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+
+    @Schema(description = "Date when the product was last updated", hidden = true)
+    @Column(name = "updated_at", insertable = false)
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
+}
+5. Access the Swagger UI
+After starting your application, you can access:
+
+Swagger UI: http://localhost:8081/swagger-ui.html
+OpenAPI JSON: http://localhost:8081/v3/api-docs
+6. Testing the APIs
+Using Swagger UI:
+Open http://localhost:8081/swagger-ui.html
+Click on "Product Controller" to expand the API endpoints
+Click on an endpoint to see its details
+Click "Try it out" to test the endpoint directly from the UI
+Using cURL:
+Create a Product:
+bash
+curl -X POST "http://localhost:8081/api/products" \
+-H "Content-Type: application/json" \
+-d '{"name": "Laptop", "price": 999.99}'
+Get a Product:
+bash
+curl -X GET "http://localhost:8081/api/products/1"
+Update a Product:
+bash
+curl -X PUT "http://localhost:8081/api/products/1?name=Gaming%20Laptop"
+7. Additional Configuration (Optional)
+You can customize the Swagger UI by adding these properties to your application.yml:
+
+yaml
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+8. Grouping APIs (Optional)
+If you have multiple controllers, you can group them:
+
+java
+@Bean
+public GroupedOpenApi publicApi() {
+    return GroupedOpenApi.builder()
+            .group("product")
+            .pathsToMatch("/api/products/**")
+            .build();
+}
+9. Security (Optional)
+If you have Spring Security, you might need to allow access to the Swagger endpoints:
+
+java
+@Configuration
+public class SecurityConfig {
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                .anyRequest().authenticated()
+            );
+        return http.build();
+    }
+}
+Now you have a fully documented API with Swagger UI! You can test all your endpoints directly from the Swagger UI interface.

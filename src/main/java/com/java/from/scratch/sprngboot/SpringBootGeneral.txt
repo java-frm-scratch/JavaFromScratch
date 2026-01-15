@@ -1,0 +1,36 @@
+=================================
+Q1.
+I have application.properties file as well as application.yaml file withing the same  spring boot application
+then is it allowed? if allowed, then which one we should use? and which one will have the highest priority?
+and what is the best recommended approach in industry?
+
+
+Ans:
+
+Yes, it's perfectly valid to have both application.properties and application.yml in the same Spring Boot application. Spring Boot supports this scenario with a specific order of precedence.
+
+application.properties   (HIGHER priority)
+application.yml          (LOWER priority)
+If the same key exists in both → application.properties wins
+
+*
+YAML is Preferred in most cases because:
+More readable for complex hierarchical configurations
+Supports comments
+Better for multi-line values
+More concise for nested properties
+*
+Use .properties when:
+Working with older Spring Boot versions with limited YAML support
+You prefer a simpler, flatter structure
+Working with tools that have better .properties support
+
+
+Use application.yml as your primary configuration file
+Use profile-specific files (e.g., application-dev.yml, application-prod.yml) for environment-specific configurations
+Keep all configuration in one place rather than splitting between .properties and .yml
+If you need to override specific properties for different environments, use environment variables or command-line arguments which have higher precedence than both .properties and .yml files
+This approach provides a good balance of maintainability, readability, and flexibility for most Spring Boot applications.
+
+=================================
+thanks you !!

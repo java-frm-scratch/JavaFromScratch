@@ -1,0 +1,277 @@
+
+1)Mapstruct for mapping
+2)Seperate DTO module
+3)Feign client for inter service communication
+4)exception handling using global exception handler
+
+
+
+i have cards table with below data
+table name: CARDS
+data:
+CREDIT_LIMIT  ACCOUNT_ID  ID  CARD_NUMBER  CARD_TYPE  CARDHOLDER_NAME  CUSTOMER_ID  CVV  EXPIRY_DATE  STATUS
+10000.0
+1
+1
+4111111111111111
+CREDIT
+John Doe
+cust12345
+123
+12/26
+ACTIVE
+
+
+and ACCOUNTS  table with below data
+ID  ACCOUNT_NUMBER  ACCOUNT_TYPE  BALANCE  BRANCH_ADDRESS  CREATED_AT  CUSTOMER_ID  EMAIL  MOBILE_NUMBER  STATUS  UPDATED_AT
+1
+123456789012
+SAVINGS
+1000.00
+123 Main St, New York, NY
+2026-01-11 21:12:40.479021
+cust12345
+john.doe@example.com
++1234567890
+ACTIVE
+2026-01-11 21:12:40.479021
+so can i get this data as combine data  using openFeignClient i want this data a customer data what are the steps give me step by step approach
+
+
+inter service communication using openfeign client
+- we can just write specification, openfeign will write implementation
+- need to add spring-cloud-starter-openfeign dependency
+- @EnableFeignClients this  annotation need to add on each client
+
+
+
+Step 1: Create DTOs for the Combined Response
+First, let's create a DTO that will hold the combined data from both services. I'll create a new DTO in the common-dtos module.
+
+java
+// In common-dtos module
+package com.java.from.scratch.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class CustomerDetailsDto {
+    // Account Details
+    private Long accountId;
+    private String accountNumber;
+    private String accountType;
+    private BigDecimal accountBalance;
+    private String branchAddress;
+
+    // Card Details
+    private Long cardId;
+    private String cardNumber;
+    private String cardType;
+    private String cardholderName;
+    private String cvv;
+    private String expiryDate;
+    private BigDecimal creditLimit;
+    private String cardStatus;
+
+    // Customer Details
+    private String customerId;
+    private String email;
+    private String mobileNumber;
+}
+
+
+Step 2: Create Feign Client in account-service
+Let's create a Feign client in the account-service to call the cards-service:
+
+java
+// In account-service
+package com.java.from.scratch.client;
+
+import com.java.from.scratch.dto.CardDto;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
+import java.util.List;
+
+@FeignClient(name = "cards-service")
+public interface CardServiceClient {
+    @GetMapping("/api/cards/account/{accountId}")
+    List<CardDto> getCardsByAccountId(@PathVariable Long accountId);
+
+    @GetMapping("/api/cards/customer/{customerId}")
+    List<CardDto> getCardsByCustomerId(@PathVariable String customerId);
+}
+Step 3: Create Service to Aggregate Data in account-service
+java
+// In account-service
+package com.java.from.scratch.service;
+
+import com.java.from.scratch.client.CardServiceClient;
+import com.java.from.scratch.dto.CustomerDetailsDto;
+import com.java.from.scratch.entity.Account;
+import com.java.from.scratch.repository.AccountRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+public class CustomerDataService {
+
+    @Autowired
+    private AccountRepository accountRepository;
+
+    @Autowired
+    private AccountService accountService;
+
+    @Autowired
+    private CardServiceClient cardServiceClient;
+
+    public CustomerDetailsDto getCustomerDetails(String customerId) {
+        // Get account details from local database
+        Account account = accountRepository.findByCustomerId(customerId)
+                .orElseThrow(() -> new RuntimeException("Account not found"));
+
+        // Get cards from cards-service
+        List<CardDto> cards = cardServiceClient.getCardsByCustomerId(customerId);
+
+        // Map to DTO
+        return mapToCustomerDetails(account, cards);
+    }
+
+    private CustomerDetailsDto mapToCustomerDetails(Account account, List<CardDto> cards) {
+        CustomerDetailsDto dto = new CustomerDetailsDto();
+
+        // Set account details
+        dto.setAccountId(account.getId());
+        dto.setAccountNumber(account.getAccountNumber());
+        dto.setAccountType(account.getAccountType());
+        dto.setAccountBalance(account.getBalance());
+        dto.setBranchAddress(account.getBranchAddress());
+
+        // Set customer details
+        dto.setCustomerId(account.getCustomerId());
+        dto.setEmail(account.getEmail());
+        dto.setMobileNumber(account.getMobileNumber());
+
+        // Set card details (take first card if exists)
+        if (!cards.isEmpty()) {
+            CardDto card = cards.get(0); // Or handle multiple cards as needed
+            dto.setCardId(card.getId());
+            dto.setCardNumber(card.getCardNumber());
+            dto.setCardType(card.getCardType());
+            dto.setCardholderName(card.getCardholderName());
+            dto.setCvv(card.getCvv());
+            dto.setExpiryDate(card.getExpiryDate());
+            dto.setCreditLimit(card.getCreditLimit());
+            dto.setCardStatus(card.getStatus());
+        }
+
+        return dto;
+    }
+
+    public int getCardCountForAccount(Long accountId) {
+        List<CardDto> cards = cardServiceClient.getCardsByAccountId(accountId);
+        return cards.size();
+    }
+}
+Step 4: Create Controller Endpoints in account-service
+java
+// In account-service
+package com.java.from.scratch.controller;
+
+import com.java.from.scratch.dto.CustomerDetailsDto;
+import com.java.from.scratch.service.CustomerDataService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/customer")
+public class CustomerDataController {
+
+    @Autowired
+    private CustomerDataService customerDataService;
+
+    @GetMapping("/{customerId}/details")
+    public ResponseEntity<CustomerDetailsDto> getCustomerDetails(@PathVariable String customerId) {
+        return ResponseEntity.ok(customerDataService.getCustomerDetails(customerId));
+    }
+
+    @GetMapping("/{customerId}/cards/count")
+    public ResponseEntity<Integer> getCardCount(@PathVariable String customerId) {
+        // Get account ID from customer ID
+        Account account = accountService.findByCustomerId(customerId)
+                .orElseThrow(() -> new RuntimeException("Account not found"));
+
+        int count = customerDataService.getCardCountForAccount(account.getId());
+        return ResponseEntity.ok(count);
+    }
+}
+Step 5: Update Cards Service
+Make sure your cards-service has the necessary endpoints:
+
+java
+// In cards-service
+@RestController
+@RequestMapping("/api/cards")
+public class CardController {
+
+    @Autowired
+    private CardService cardService;
+
+    @GetMapping("/account/{accountId}")
+    public ResponseEntity<List<CardDto>> getCardsByAccountId(@PathVariable Long accountId) {
+        List<Card> cards = cardService.findByAccountId(accountId);
+        List<CardDto> cardDtos = cards.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(cardDtos);
+    }
+
+    @GetMapping("/customer/{customerId}")
+    public ResponseEntity<List<CardDto>> getCardsByCustomerId(@PathVariable String customerId) {
+        List<Card> cards = cardService.findByCustomerId(customerId);
+        List<CardDto> cardDtos = cards.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(cardDtos);
+    }
+
+    private CardDto convertToDto(Card card) {
+        // Implementation to convert Card entity to CardDto
+    }
+}
+Step 6: Enable Feign Clients in account-service
+Make sure your main application class in account-service has EnableFeignClients:
+
+java
+@SpringBootApplication
+@EnableFeignClients
+public class AccountServiceApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(AccountServiceApplication.class, args);
+    }
+}
+Step 7: Test the Endpoints
+You can now call these endpoints:
+
+Get customer details with card information:
+GET http://localhost:8081/api/customer-data/cust12345/details
+Get card count for a customer:
+GET /api/customer/cust12345/cards/count
+Key Benefits of This Approach:
+Single Responsibility: Each service maintains its own data
+Account as Source of Truth: Account service acts as the aggregator
+Flexibility: Easy to add more services (loans, investments, etc.) in the future
+Performance: Can implement caching at the aggregator level
+
+======================================
