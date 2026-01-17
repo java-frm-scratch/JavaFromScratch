@@ -1,0 +1,153 @@
+
+Q) what is completableFuture?
+- introduced in java 8
+completable future is for asynchronous programming
+means without blocking your main thread, you can write and execute n number of tasks
+when task is completed, it will notify to main thread
+
+Q) why compeltable future? or what are disadvantages of future?
+
+before completable future
+before compeltablefuture, below are present
+- future
+- executor service
+disadvantages of future:
+1)we cannot complete future manually...means if you are executing any thread,
+ we dont have any option to forcefully complete it
+2)we cannot chain multiple futures(4)we cannot combine multiple futures together...)..
+ means after executing any thread,
+ and you get any response, we cannot reuse it,
+ or simply , I cannot pass that response to another thread for execution
+3)we cannot handle exceptions
+
+
+
+Q) how to create future objects?
+Ans: we can create future objects using executer service
+example:
+ // Create a thread pool with 3 threads
+        ExecutorService executorService = Executors.newFixedThreadPool(3);
+// Task 1: Get all employees
+            System.out.println("\n--- Starting employee data fetch ---");
+            Future<List<Employee>> allEmployeesFuture = executorService.submit(EmployeeDatabaseService::getAllEmployees);
+
+
+Q) what is the difference between executor.submit and executor.execute methods?
+Ans:
+executor.submit takes callable as argument (if we use executor.submit, then we can return a value from it)
+executor.execute takes Runnable as argument(Runnable dont return anything )
+
+============================================
+
+
+====================================================
+
+Understanding with a Real-World Example
+🏦 Scenario: Bank Loan Processing
+
+You submit a loan application.
+
+❌ Without callback (ExecutorService style)
+
+You submit the application
+
+You keep checking:
+
+“Is it approved now?”
+
+“Is it approved now?”
+
+“Is it approved now?”
+
+You cannot register logic to be notified automatically
+
+📌 This is exactly how Future.get() works
+You wait (block) until the result is ready.
+
+
+ExecutorService – Theoretical One-Liners
+
+Manages and reuses a pool of threads
+
+Separates task submission from task execution
+
+Executes tasks asynchronously using worker threads
+
+Controls concurrency using thread pools
+
+Prevents thread creation overhead
+
+Supports Runnable and Callable tasks(callable return a result but runnable will not return any result)
+
+Returns Future as a placeholder for results
+
+Result retrieval using Future.get() is blocking
+
+Does not support task chaining
+
+Does not support callbacks(eg lets say you have submitted a loan application
+and you keep checking is it approved or not? ... you cannot get automatic replay and approval notification
+this is how future.get works )
+
+
+Poor support for dependent tasks
+
+Error handling is delayed and wrapped
+
+Developer must manage lifecycle explicitly
+
+Suitable for simple parallel task execution
+
+Best for legacy or blocking applications
+
+Focuses on thread management, not workflow management
+
+============================================================
+
+You submit the application
+
+You say:
+
+“When approval is done, call me and do this”
+
+System notifies you automatically
+
+You don’t wait or block
+
+📌 This is callback behavior
+
+CompletableFuture – Theoretical One-Liners
+
+Represents an asynchronous computation
+
+Supports non-blocking execution
+
+Allows chaining multiple async stages
+
+Enables composition of dependent tasks
+
+Provides fluent, functional-style API
+
+Supports callbacks on completion
+
+Enables parallel task combination
+
+Handles async pipelines cleanly
+
+Supports transformation of results
+
+Supports exception handling in async flow
+
+Avoids blocking with callbacks
+
+Improves readability of async code
+
+Suitable for reactive and microservice systems
+
+Integrates well with modern Java applications
+
+Can run tasks on custom executors
+
+Focuses on workflow orchestration, not thread management
+
+========================================================================
