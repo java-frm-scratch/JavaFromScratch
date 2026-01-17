@@ -1,0 +1,85 @@
+Q1) what  is functional interface ?
+Ans:
+*Functional interface has exactly 1 abstract method
+*public abstract are written by-default for interface methods, no need to add if you add,
+*you will get message they are redundant
+*@FunctionalInterface annotation is not mandatory, even if you don’t add it and as long as
+interface is having single abstract method, it is perfectly allowed
+* functional interface can have n number of default methods
+* default methods can be overridden inside the implementing class if they want to implement it.. but not mandatory
+implementation of default methods are optional
+
+
+
+* static methods inside an interface is belong to that interface , and not instance level
+static methods cannot be overridden
+** if more than 1 abstract methods are added, then compiler will throw  error like below (compile time error)
+Multiple non-overriding abstract methods found in PersonFunctionalInterface@PersonFunctionalInterface.java#L3
+
+
+
+*can a functional interface extend another functional interface?
+yes , that is allowed example
+public interface PersonFunctionalInterface extends AgeProvider{
+
+*a Functional interface can have method from Object class? can they will able to override object class methods?
+Ans:
+yes they can , because object class methods are not treated as abstract methods
+why its allowed is that, functional interface inherits Object class methods, and when we declares it them in functional interface , it
+wont treat them as abstract methods
+
+
+*what is diamond problem with default methods -- this problem arises
+The diamond problem occurs when:
+
+A class implements two interfaces
+
+Both interfaces have the same method signature
+
+Java gets confused about which method to call
+
+Step 1: Two interfaces with same default method
+interface Payment {
+    default void pay() {
+        System.out.println("Pay using cash");
+    }
+}
+
+interface OnlinePayment {
+    default void pay() {
+        System.out.println("Pay using online method");
+    }
+}
+
+public class OrderService implements Payment, OnlinePayment{
+}
+
+you will get compile time error below
+com.java.from.scratch.java8.OrderService inherits unrelated defaults for pay() from types com.java.from.scratch.java8.Payment and com.java.from.scratch.java8.OnlinePayment
+
+here, Java does NOT know which pay() to choose.
+How Java 8 Solves the Diamond Problem
+Class must override the conflicting method explicitly
+eg:
+class OrderService implements Payment, OnlinePayment {
+
+    @Override
+    public void pay() {
+        Payment.super.pay();   // or OnlinePayment.super.pay();
+    }
+}
+
+you can combine both as well
+public class OrderService implements Payment, OnlinePayment{
+
+    @Override
+    public void pay() {
+        Payment.super.pay();
+        OnlinePayment.super.pay();// you can combine both as well
+
+    }
+}
+
+* interface fields are by default public static final, so interface can have fields but they are final
+and be accessed using interface name.
+
