@@ -1,0 +1,20 @@
+Q) what are marker interfaces? if they dont have any methods why they exist?
+- marker interfaces are used to apply certain rules on the creation or usage
+- they dont have any methods
+- but serve as a "marker" or "tag" for the Java Virtual Machine (JVM) to perform special operations on the marked class
+
+- lets say you have a class and you want to preverse thee state of that class into a file
+like below
+ // Serialize the instance to a file
+            try (ObjectOutput out = new ObjectOutputStream(
+                    new FileOutputStream("singleton.ser"))) {
+                out.writeObject(instance1);
+            }
+ you want to preserve the instance of the class to a file named singleton.ser
+ - and lets say you are not implementing the Serializable interface in the instance1 class
+ then  This will throw "java.io.NotSerializableException"
+ - This is because the ObjectOutputStream checks if the class implements the Serializable
+ marker interface before attempting serialization.
+ - The marker interface acts as a flag to the JVM that this class can be serialized.
+ ======================================================================================================
+ 

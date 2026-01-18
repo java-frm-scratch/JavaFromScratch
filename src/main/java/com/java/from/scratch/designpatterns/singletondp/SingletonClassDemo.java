@@ -40,7 +40,7 @@ public class SingletonClassDemo {
         //breakUsingReflectionTest();
 
         //2.5 we can still break using serialization and deserialization
-        //breakWithSerialization();
+        breakWithSerialization();
 
         //2.6 we can resolve seralization and deserialization break using readResolve method
         // all mentioned here: BasicConnectionPoolWithSerializationBreakResolved
@@ -97,7 +97,7 @@ public class SingletonClassDemo {
 
         //4. best singleton recommended  by Joshua Bloch is enum singleton
         // details can be found here :
-        testBestSingleTonUsingEnumRecommendedByBillPughAndJoshuaBlouch_ConnectionPoolExamplel();
+        //testBestSingleTonUsingEnumRecommendedByBillPughAndJoshuaBlouch_ConnectionPoolExamplel();
 
 
 
