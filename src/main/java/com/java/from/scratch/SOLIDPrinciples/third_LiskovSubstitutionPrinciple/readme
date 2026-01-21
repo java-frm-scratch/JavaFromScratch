@@ -1,0 +1,62 @@
+Objects should be replacable with their subtypes
+without affecting the correctness of the program
+
+
+means child should listen to their parent
+
+actual use case:
+- lets say there is CodPayment is also supported
+- and CodPayment  is a class which implements PaymentStrategy
+- and if its throwing:   throw new UnsupportedOperationException("COD cannot process online payments"); then it is not following l
+- then its breaking the design and contract with the parent
+- so instead it should process the order and send message for cOD amount
+- so that it does not violates parent contract
+
+
+Simple meaning:
+⭐ A child class must behave like its parent class.
+⭐ No surprises, no broken logic.
+
+
+Imagine you order a cab through an app.
+Parent: Cab
+Children:
+
+MiniCab
+SedanCab
+SUVCab
+
+No matter which cab type arrives:
+
+It must take you to destination.
+It should not stop in the middle and say:
+❌ “Sorry, I don’t support long routes.”
+❌ “I can’t take more than 2 km.”
+
+Every cab should fulfill the expectations of a Cab.
+=========================================================
+
+How it Connects to Our Example
+We are using a PaymentStrategy interface for OCP:
+
+CreditCardPayment
+UpiPayment
+WalletPayment
+
+For LSP to be valid:
+
+Every payment type must behave like a PaymentStrategy.
+None should break expected behavior.
+
+=========================
+
+Benefits of LSP
+✔ Predictable behavior
+Every child behaves as expected.
+✔ No sudden crashes
+Child classes never break parent promises.
+✔ Clean, consistent architecture
+Easier onboarding for developers.
+✔ Works perfectly with OCP
+You can add new features without modifying older ones — and without breaking the system.
+===================

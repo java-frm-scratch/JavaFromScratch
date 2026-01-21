@@ -1,0 +1,44 @@
+High-level modules should not depend on low-level modules.
+Both should depend on abstractions.
+
+
+Simple meaning:
+⭐ Your main business logic should depend on interfaces, not concrete classes.
+⭐ Avoid “new” keyword inside business logic—inject dependencies instead.
+
+
+This is the backbone of clean architecture, microservices, Spring Boot, .NET DI container, etc.
+
+======================================
+Real-World Analogy (Super Easy)
+Imagine you buy a mobile phone charger.
+You don’t care:
+
+which company made the charger
+how it works internally
+
+You only care that it supports the USB port.
+So the phone depends on the USB standard (interface)…
+NOT on the concrete charger!
+➡ Phone depends on abstraction → NOT concrete implementation.
+This is DIP.
+
+=========================================
+
+ Benefits of DIP
+✔ Loose coupling
+High-level code is not tied to low-level classes.
+✔ Easy to switch implementations
+Want Stripe instead of PayPal?
+Just change the injected class → no code modifications.
+✔ Highly testable
+You can inject mocks or stubs in unit tests.
+✔ Supports OCP
+Add new implementations without changing existing logic.
+✔ Clean, scalable architecture
+Used in:
+
+Spring Dependency Injection
+.NET Dependency Injection Container
+Clean Architecture
+Onion Architecture

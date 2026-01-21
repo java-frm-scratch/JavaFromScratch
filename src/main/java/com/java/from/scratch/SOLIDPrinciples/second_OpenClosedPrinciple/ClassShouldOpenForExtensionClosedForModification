@@ -1,0 +1,33 @@
+Open for Extension
+- same class should not be modified when you add new payment methods
+- create a payment strategy interface
+- create seperate classes(WalletPayment, CreditCardPayment etc) and implemnt PaymentStrategy interface
+- in this way , we keep extension of classes
+- so in future any new payment comes then we can happily add new class instead of touching existing code
+
+Closed for modification
+- create PaymentService class
+- create object reference of PayemmntStrategy inside this service
+- create makePayment inside it
+- call pay method inside makepayment class
+-No matter how many payment methods you add, this class never changes.
+
+
+✔ Open for Extension
+Add:
+
+NetBanking
+Crypto
+EMI
+→ Just create new classes.
+
+✔ Closed for Modification
+No changes in:
+
+PaymentService
+PaymentStrategy
+
+✔ Loose coupling
+Code depends on an interface → not concrete implementations.
+✔ High Cohesion
+Each payment class does exactly one job.

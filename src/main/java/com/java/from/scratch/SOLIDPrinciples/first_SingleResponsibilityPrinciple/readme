@@ -1,0 +1,6 @@
+This implementation follows the Single Responsibility Principle because:
+
+Each class has only one reason to change
+Dependencies are injected through the constructor
+The code is more maintainable and testable
+You can easily swap implementations (e.g., switch from TextInvoice to PDFInvoice)

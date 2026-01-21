@@ -1,0 +1,81 @@
+Clients should not be forced to depend on methods they do not use.
+
+
+Problem:
+lets say your company sends email after order is complete.
+and not supports sms, whatsup, push notification
+so you should design an interface which deals with sending emails
+dont add everthing sending sms, whatsapp message, push notification in a
+single interface
+
+short: Split the large interface into smaller, focused interfaces.
+
+
+in simple meaning:
+ dont create big interfaces with n number of methods
+if its not required
+if you do so , then your class must need to implement those methods
+and even though you send exception from it, then aslo its very
+bad design
+here also, if any change in interface will force to implement
+all classes t folow the change
+
+
+
+Simple meaning:
+⭐ Don’t create giant interfaces.
+⭐ Create small, specific interfaces.
+⭐ A class should implement only what it needs—not more.
+
+ Real-Time Problem (from real-world software)
+🎯 Scenario:
+You are building an Order Notification System.
+Notifications include:
+
+Email notification
+SMS notification
+WhatsApp notification
+Push app notification
+
+So you create one large interface:
+
+public interface NotificationService {
+    void sendEmail(String message);
+    void sendSms(String message);
+    void sendWhatsapp(String message);
+    void sendPush(String message);
+}
+
+ Problem
+Let’s say a company uses only Email and SMS, so you implement:
+
+public class EmailNotificationService implements NotificationService {
+    @Override
+    public void sendEmail(String message) { ... }
+
+    @Override
+    public void sendSms(String message) {
+        throw new UnsupportedOperationException("SMS not supported");
+    }
+
+    @Override
+    public void sendWhatsapp(String message) {
+        throw new UnsupportedOperationException("WhatsApp not supported");
+    }
+
+    @Override
+    public void sendPush(String message) {
+        throw new UnsupportedOperationException("Push not supported");
+    }
+}
+
+What’s wrong?
+
+You are forced to implement methods you don’t need.
+You end up throwing UnsupportedOperationException.
+If someone calls sendPush() → your app crashes.
+The interface is fat, bloated, not reusable.
+Any change in the interface forces all implementations to change → violates OCP too.
+
+This is a real problem many enterprise systems face.
+

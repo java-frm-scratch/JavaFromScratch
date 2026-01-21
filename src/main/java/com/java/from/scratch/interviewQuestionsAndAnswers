@@ -17,4 +17,17 @@ like below
  marker interface before attempting serialization.
  - The marker interface acts as a flag to the JVM that this class can be serialized.
  ======================================================================================================
- 
+
+ Predicate Functional interface
+ Predicate its a functional interface which has a method called as test()
+ -
+ // Predicate to find IT department employee
+ // Predicate to find employees with salary > 60000
+ // Chaining predicates: IT employees with high salary(> 60000)
+
+ // checking the validity of an email
+ 1) email should not be null
+ 2)email should contain @
+ 3) and email should end with .com
+
+=========================================================================================
