@@ -1,0 +1,68 @@
+1)JVM starts and loaads Tester.class
+2)main method is invoked
+3)stack frame created
+ 4)below will be get called is called
+ConfigurableApplicationContext context =
+        SpringApplication.run(Tester.class, args);
+form here everything is spring esponsibility
+5)spring creates AnnotationConfigServletWebServerApplicationContext
+- this is application context container
+6) at thsi point empty application context container will be created No car, no engine
+7) @SpringBootApplication will get processed
+8)it internally has below 3 annotations
+@Configuration
+@EnableAutoConfiguration
+@ComponentScan
+9) component scanning will start
+10) in scanning, it founds 2 objects are there Car and Engine-- still no object creation
+11)then spring bean definations (metadata) will be get creaetd
+BeanDefinition: car
+Class: Car
+Scope: singleton
+Lazy: false
+DependsOn: engine
+
+BeanDefinition: engine
+Class: Engine
+Scope: singleton
+
+12) this is just info no object created yet
+13)below bean factory is internally rady
+ApplicationContext
+ └── DefaultListableBeanFactory
+
+14)this factory knows(since it read metadata first)
+- which beans are there
+- which beans need to created
+15)singleton bean creation starts
+16)Engine bean will get created first
+spring uses reflection
+calls constructor new engine() to create bean
+stores instance in singleton cache
+
+17)Car bean will get created
+- detects dependencies
+- fetch enfine bean
+calls constructor and awt bean
+eg: new Car(engine)
+and then it will store it to singleton pool
+18)
+then post processors will run
+19)then it returns the context
+now this line completes
+ConfigurableApplicationContext context = ...
+20)
+when we do
+ Car car = context.getBean(Car.class);
+ spring loks in singleton cache,
+ finds car bean
+ and returns it
+================================
+Lazy VS eager initialization
+1)
+by default eager initialization will be there
+- constructor will get called forst to create an instance of the object
+2)
+by @Lazy annotation you can use to to lazily create instances when you call getBean method,
+then only instance will get created
+===============================================

@@ -1,0 +1,10 @@
+lets say producer is there and he keeps producing .. and lets say system is full
+then producer waits until system is available again
+
+and let say consumer is there
+and consumer is consuming, and continuously consuming
+and lets say there are items present , in the queue, then consumer waits until there
+some order comes inside the queue
+
+this all can be achieved by using BlockingQueue
+without using wait/ notify manually
