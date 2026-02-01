@@ -1,0 +1,40 @@
+User → Booking Service → Inventory Service → Payment Service → Notification Service
+
+1)users hit the request for booking tickets from mobile or from web app
+- there are n number of users who will try to book the tickets from mobile or from web app
+2)
+- each request will go to API gateway -- here, at api gateway level, we will handle security and rate limiting
+
+3)there are different micro services like
+- ticket booking service
+- payment service
+- user service
+- notification service
+- seat availability(inventory) service
+- auth service
+
+4)
+each service can have its own load balancer to handle the load
+
+5)also there will be messaging queue , each service will send event details
+like when user books a ticket, it sends TICKET_BOOKING_INITIATED event to queue
+then consumers like inventory service will consume this event and update the inventory
+then payment service will consume this event and update the payment status
+then notification service will consume this event and send the notification
+like wise ...
+
+6) then we will use postgre sql to store booking , payment info
+- because it avoids duplicate bookings
+- handle locking
+- saving payment transaction
+
+7) we will use mongo db where read operations are more
+- like sear layout
+- user booking history
+- entire seat map etc
+8) also in between the db layer, we will use cache like redis cache or memcached
+- to reduce latency
+- movie booking system is read heavy system
+- to get faster reponse, we will use cache
+- in cache, we will store movies, seat availability, pricing, offers,
+frequently accessed metadata (theatre details, screen info etc)
