@@ -1,0 +1,3 @@
+- A virtual thread is a lightweight thread managed by the JVM, not the OS.
+- You can create millions of virtual threads with very low memory cost.
+-
