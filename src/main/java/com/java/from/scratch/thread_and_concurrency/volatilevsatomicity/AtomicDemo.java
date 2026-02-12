@@ -16,19 +16,29 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Simple idea:
  *
  * “Update value ONLY if no one changed it since I last checked”
+ *
+ * //Counter.count.incrementAndGet();
+ * //static AtomicInteger count = new AtomicInteger(0);
+ *
  */
 public class AtomicDemo {
 
+    /**
+     * Two threads modify count at the same time
+     *  * expected output is 2000
+     *  * but actual is different at every run ...
+     * @throws InterruptedException
+     */
     static void main() throws InterruptedException {
         Runnable task = () -> {
             for (int i = 0; i < 1000; i++) {
-                Counter.count++;
-                //Counter.count.incrementAndGet();
+                //Counter.count++;
+                Counter.count.incrementAndGet();
             }
         };
 
-        Thread t1 = new Thread(task);
-        Thread t2 = new Thread(task);
+        Thread t1 = new Thread(task);//1000
+        Thread t2 = new Thread(task);//1000
         t1.start();
         t2.start();
         t1.join();
@@ -40,6 +50,6 @@ public class AtomicDemo {
 }
 
 class Counter {
-    static int count = 0;
-    //static AtomicInteger count = new AtomicInteger(0);
+    //static int count = 0;
+    static AtomicInteger count = new AtomicInteger(0);
 }
